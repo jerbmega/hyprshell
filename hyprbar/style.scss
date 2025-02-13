@@ -86,16 +86,15 @@ window.Bar {
     }
 
     .ControlCenter {
-        margin-left: 6px;
         border-radius: 18px; 
-        background-color: color.adjust($fg, $alpha: -0.8);
-
-        * {
+        background-color: transparent;
+        
+        .Icons* {
             padding: 0 6px;
         };
 
-        &:hover, &:focus {
-            background-color: rgb(0, 0, 0);
+        &:hover {
+            background-color: color.adjust($fg, $alpha: -0.8);
         }
     }
 }

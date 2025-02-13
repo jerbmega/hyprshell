@@ -167,32 +167,34 @@ local function ControlCenter()
 
     local speaker = Wp.get_default().audio.default_speaker
     
-    
-	return Widget.Box({
-        class_name = "ControlCenter";
-		wired:as(
-			function(w)
-				return Widget.Icon({
-					class_name = "Ethernet",
-					icon = bind(w, "icon-name"),
-				})
-			end
-		),
-        wifi:as(
-            function(w)
-                return Widget.Icon({
-                    visible = bind(wired, "get_device") == nil,
-                    class_name = "Wifi",
-                    icon = bind(w, "icon-name"),
-                })
-            end
-        ),
-        Widget.Icon({
-			icon = bind(speaker, "volume-icon"),
-		}),
-        Widget.Icon({
-			icon = "power-symbolic",
-		}),
+    return Widget.Button({
+		class_name = "ControlCenter";
+		Widget.Box({
+			class_name = "Icons";
+			wired:as(
+				function(w)
+					return Widget.Icon({
+						class_name = "Ethernet",
+						icon = bind(w, "icon-name"),
+					})
+				end
+			),
+			wifi:as(
+				function(w)
+					return Widget.Icon({
+						visible = bind(wired, "get_device") == nil,
+						class_name = "Wifi",
+						icon = bind(w, "icon-name"),
+					})
+				end
+			),
+			Widget.Icon({
+				icon = bind(speaker, "volume-icon"),
+			}),
+			Widget.Icon({
+				icon = "system-shutdown-symbolic",
+			}),
+		})
 	})
 end
 
@@ -217,7 +219,6 @@ return function(gdkmonitor)
 			Widget.Box({
 				halign = "END",
 				SysTray(),
-
                 ControlCenter(),
 				BatteryLevel(),		
 			}),
