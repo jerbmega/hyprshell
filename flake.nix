@@ -1,5 +1,5 @@
 {
-  description = "Creatively named custom bar for Hyprland";
+  description = "Creatively named custom shell for Hyprland";
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
     astal = {
@@ -18,8 +18,8 @@
   in {
     packages.${system}.default = astal.lib.mkLuaPackage {
       inherit pkgs;
-      name = "hyprbar"; # how to name the executable
-      src = ./hyprbar; # should contain init.lua
+      name = "hyprshell"; # how to name the executable
+      src = ./hyprshell; # should contain init.lua
 
       # add extra glib packages or binaries
       # TODO: luajit this bad boy UP
@@ -28,6 +28,7 @@
         astal.packages.${system}.hyprland
         astal.packages.${system}.mpris
         astal.packages.${system}.network
+        astal.packages.${system}.notifd
         astal.packages.${system}.tray
         astal.packages.${system}.wireplumber
         pkgs.dart-sass

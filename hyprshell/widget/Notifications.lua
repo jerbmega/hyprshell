@@ -1,0 +1,136 @@
+local astal = require("astal")
+local Widget = require("astal.gtk3.widget")
+local Hyprland = astal.require("AstalHyprland")
+local notifd = astal.require("AstalNotifd").get_default()
+
+local bind = astal.bind
+local astalify = astal.astalify
+local timeout = astal.timeout
+
+local file_exists = require("lib").file_exists
+local async_sleep = require("lib").async_sleep
+
+local notifications = {}
+
+local function Image(n)
+	return (n.image and file_exists(n.image)) and
+        Widget.Box(
+            {
+                valign = "START",
+                class_name = "image",
+                css = string.format("background-image: url('%s')", n.image)
+            }
+        )
+end
+
+local function Header(n)
+    return Widget.Box(
+        {
+            class_name = "header",
+            (n.app_icon or n.desktop_entry) and
+                Widget.Icon(
+                    {
+                        class_name = "icon",
+                        icon = n.app_icon or n.desktop_entry
+                    }
+                ),
+            Widget.Label(
+                {
+                    class_name = "name",
+                    label = n.app_name or "Unknown",
+                }
+            )
+        }
+    )
+end
+
+local function Actions(n)
+    actions = {}
+
+    for _, action in pairs(n.actions) do
+        if(action.label ~= "") then
+			table.insert(
+				actions,
+				Widget.Button(
+					{
+						hexpand = true,
+						on_clicked = function()
+							return n:invoke(action.id)
+						end,
+						Widget.Label(
+							{
+								label = action.label,
+								halign = "CENTER",
+								hexpand = true
+							}
+						)
+					}
+				)
+			)
+		end
+    end
+    return Widget.Box(actions)
+end
+
+local function NotificationPopup(n)
+    local Anchor = astal.require("Astal").WindowAnchor
+
+    return Widget.Window(
+        {
+            class_name = "notification_popup",
+            anchor = Anchor.TOP,
+			margin_top = 10,
+            Widget.Box(
+                {
+                    class_name = "container",
+                    vertical = true,
+					setup = function(self)
+						timeout(5000, function()
+							self:destroy()
+						end)
+					end,
+                    Header(n),
+                    Widget.Box(
+                        {
+                            class_name = "content",
+                            Image(n),
+                            Widget.Box(
+                                {
+                                    vertical = true,
+                                    Widget.Label(
+                                        {
+                                            class_name = "summary",
+                                            halign = "START",
+                                            xalign = 0,
+                                            ellipsize = "END",
+                                            label = n.summary
+                                        }
+                                    ),
+                                    Widget.Label(
+                                        {
+                                            class_name = "body",
+                                            wrap = true,
+                                            use_markup = true,
+                                            halign = "START",
+											valign = "START",
+                                            xalign = 0,
+                                            justify = "FILL",
+                                            label = n.body,
+											vexpand = true
+                                        }
+                                    ),
+                                    Actions(n)
+                                }
+                            )
+                        }
+                    )
+                }
+            )
+        }
+    )
+end
+
+notifd.on_notified = function(_, id)
+    local n = notifd:get_notification(id)
+    NotificationPopup(n)
+end

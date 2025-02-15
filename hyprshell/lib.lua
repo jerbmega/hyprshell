@@ -1,4 +1,6 @@
+local astal = require("astal")
 local Variable = require("astal").Variable
+local GLib = astal.require("GLib")
 
 local M = {}
 
@@ -19,6 +21,10 @@ function M.map(array, func)
 	end
 	return new_arr
 end
+
+---@param path string
+---@return boolean
+function M.file_exists(path) return GLib.file_test(path, "EXISTS") end
 
 M.date = Variable(""):poll(1000, "date")
 

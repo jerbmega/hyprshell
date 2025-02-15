@@ -1,0 +1,37 @@
+@use "sass:color";
+
+$bg: #212223;
+$fg: #f1f1f1;
+$accent: #378DF7;
+$radius: 7px;
+
+
+
+window.notification_popup {  
+    border-radius: 18px;
+    background: color.adjust($fg, $alpha: -0.8);
+
+    .container {
+        margin: 10px;
+        min-width: 400px;
+
+        .image {
+            min-width: 100px;
+            min-height: 100px;
+            border-radius: 18px;
+            margin: 0 10px 0 0;
+            background-size: cover;
+            background-position: center;
+        }   
+
+        .header {
+            font-weight: bold;
+        }
+
+        .content {  
+            .summary {
+                font-weight: bold;
+            }
+        }
+    };
+}
