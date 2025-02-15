@@ -74,12 +74,14 @@ end
 
 local function NotificationPopup(n)
     local Anchor = astal.require("Astal").WindowAnchor
+    local Layer = astal.require("Astal").Layer
 
     return Widget.Window(
         {
             class_name = "notification_popup",
             anchor = Anchor.TOP,
 			margin_top = 10,
+            layer = Layer.OVERLAY,
             Widget.Box(
                 {
                     class_name = "container",
