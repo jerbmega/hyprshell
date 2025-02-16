@@ -12,6 +12,8 @@ local async_sleep = require("lib").async_sleep
 
 local notifications = {}
 
+local active_notification = nil
+
 local function Image(n)
 	return (n.image and file_exists(n.image)) and
         Widget.Box(
@@ -24,22 +26,41 @@ local function Image(n)
 end
 
 local function Header(n)
+    icon = nil
+
+    if n.app_icon ~= "" then
+        icon = n.app_icon
+    elseif n.desktop_entry and n.desktop_entry ~= "" then
+        -- this might backfire, so we'll have to check if this always works
+        icon = n.desktop_entry:lower() .. "-symbolic"
+    end
+
     return Widget.Box(
         {
             class_name = "header",
-            (n.app_icon or n.desktop_entry) and
+            icon and
                 Widget.Icon(
                     {
                         class_name = "icon",
-                        icon = n.app_icon or n.desktop_entry
+                        icon = icon
                     }
                 ),
             Widget.Label(
                 {
                     class_name = "name",
                     label = n.app_name or "Unknown",
+                    hexpand = true,
+                    halign = "START",
                 }
-            )
+            ),
+            Widget.Button({
+                class_name = "close circular",
+                valign = "END",
+                Widget.Icon({
+                    icon = "window-close-symbolic",
+                }),
+                on_clicked = function(self) self:get_parent_window():destroy() end
+            })
         }
     )
 end
@@ -48,7 +69,7 @@ local function Actions(n)
     actions = {}
 
     for _, action in pairs(n.actions) do
-        if(action.label ~= "") then
+        if action.label ~= "" then
 			table.insert(
 				actions,
 				Widget.Button(
@@ -75,8 +96,12 @@ end
 local function NotificationPopup(n)
     local Anchor = astal.require("Astal").WindowAnchor
     local Layer = astal.require("Astal").Layer
+    
+    if active_notification then
+        active_notification:destroy()
+    end
 
-    return Widget.Window(
+    active_notification = Widget.Window(
         {
             class_name = "notification_popup",
             anchor = Anchor.TOP,
@@ -116,12 +141,11 @@ local function NotificationPopup(n)
                                             halign = "START",
 											valign = "START",
                                             xalign = 0,
-                                            justify = "FILL",
                                             label = n.body,
 											vexpand = true
                                         }
                                     ),
-                                    Actions(n)
+                                    -- Actions(n) TODO: make these not suck
                                 }
                             )
                         }
@@ -130,6 +154,8 @@ local function NotificationPopup(n)
             )
         }
     )
+
+    return active_notification
 end
 
 notifd.on_notified = function(_, id)
