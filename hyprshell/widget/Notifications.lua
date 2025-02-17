@@ -48,7 +48,7 @@ local function Header(n)
             Widget.Label(
                 {
                     class_name = "name",
-                    label = n.app_name or "Unknown",
+                    label = (n.app_name ~= "") and n.app_name or "Unknown",
                     hexpand = true,
                     halign = "START",
                 }
