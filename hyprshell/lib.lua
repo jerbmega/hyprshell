@@ -28,4 +28,14 @@ function M.file_exists(path) return GLib.file_test(path, "EXISTS") end
 
 M.date = Variable(""):poll(1000, "date")
 
+
+function M.truncate(str)
+    if #str > 100 then
+        return string.sub(str, 1, 100) .. "..."
+    else
+        return str
+    end
+end
+
+
 return M

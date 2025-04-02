@@ -8,7 +8,7 @@ local astalify = astal.astalify
 local timeout = astal.timeout
 
 local file_exists = require("lib").file_exists
-local async_sleep = require("lib").async_sleep
+local truncate = require("lib").truncate
 
 local notifications = {}
 
@@ -31,8 +31,7 @@ local function Header(n)
     if n.app_icon ~= "" then
         icon = n.app_icon
     elseif n.desktop_entry and n.desktop_entry ~= "" then
-        -- this might backfire, so we'll have to check if this always works
-        icon = n.desktop_entry:lower() .. "-symbolic"
+        icon = n.desktop_entry:lower()
     end
 
     return Widget.Box(
@@ -48,7 +47,7 @@ local function Header(n)
             Widget.Label(
                 {
                     class_name = "name",
-                    label = (n.app_name ~= "") and n.app_name or "Unknown",
+                    label = (n.app_name ~= "") and n.app_name:gsub("^%l", string.upper) or "Unknown",
                     hexpand = true,
                     halign = "START",
                 }
@@ -59,7 +58,10 @@ local function Header(n)
                 Widget.Icon({
                     icon = "window-close-symbolic",
                 }),
-                on_clicked = function(self) self:get_parent_window():destroy() end
+                on_clicked = function(self) 
+                    self:get_parent_window():destroy()
+                    n:dismiss()
+                end
             })
         }
     )
@@ -130,14 +132,13 @@ local function NotificationPopup(n)
                                             halign = "START",
                                             xalign = 0,
                                             ellipsize = "END",
-                                            label = n.summary
+                                            label = n.summary,
                                         }
                                     ),
                                     Widget.Label(
                                         {
                                             class_name = "body",
                                             wrap = true,
-                                            use_markup = true,
                                             halign = "START",
 											valign = "START",
                                             xalign = 0,
