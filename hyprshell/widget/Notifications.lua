@@ -99,9 +99,9 @@ local function NotificationPopup(n)
     local Anchor = astal.require("Astal").WindowAnchor
     local Layer = astal.require("Astal").Layer
     
-    if active_notification then
+    --[[if active_notification then
         active_notification:destroy()
-    end
+    end]]
 
     active_notification = Widget.Window(
         {
